@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [0.1.0] - 2026-11-12
+
+First public release.
 
 ### Added
 - Installer: one `Popper-Setup.exe`, per-user, no administrator rights, in the wizard style of the other AI Literacy Lab apps
@@ -15,9 +17,7 @@
 ### Fixed
 - Build scripts find a per-user AutoHotkey install
 
-## [0.1.0] - 2026-11-10
-
-### Added
+### Added in the first build
 - Automatic recording when a watched app takes the microphone, read from the Windows microphone privacy list
 - Watched apps list with Teams, Zoom, Webex and Slack on by default, browsers off, and an "add an app that used the mic" picker
 - Two-track capture through WASAPI: your microphone, and loopback of the speaker device for everyone else
