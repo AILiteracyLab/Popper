@@ -147,6 +147,12 @@ for e in entries
     if e.inUse
         inUse .= (inUse = "" ? "" : ", ") e.label
 Check("mic history readable", entries.Length > 0, entries.Length " apps, in use now: " (inUse = "" ? "none" : inUse))
+live := Map()
+liveErr := ""
+try live := Detector.LiveCaptureKeys()
+catch as e
+    liveErr := e.Message
+Check("live capture sessions readable", liveErr = "", liveErr = "" ? live.Count " recording now" : liveErr)
 Check("self excluded from detection", Detector.ActiveApp() = "" || !InStr(StrLower(Detector.ActiveApp()), "autohotkey"))
 Check("Teams key matches", RegExMatch("msteams_8wekyb3d8bbwe", "msteams_") > 0)
 

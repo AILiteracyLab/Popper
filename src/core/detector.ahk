@@ -16,7 +16,7 @@ class Detector {
     static RegRoot := "Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone"
 
     /**
-     * Every app Windows has seen use the mic.
+     * Every app Windows has seen use the mic, plus any app recording now.
      * Returns an array of {key, label, inUse, lastStart}.
      */
     static Entries() {
@@ -36,7 +36,75 @@ class Detector {
                 }
             }
         }
+        ; Some Windows builds stop updating that list. Ask the audio engine
+        ; which apps are recording right now as well, and trust either source.
+        live := Map()
+        try live := this.LiveCaptureKeys()
+        for e in list {
+            k := StrLower(e.key)
+            if live.Has(k) {
+                e.inUse := true
+                live.Delete(k)
+            }
+        }
+        now := 0
+        DllCall("GetSystemTimeAsFileTime", "int64*", &now)
+        for k, key in live
+            list.Push({key: key, label: this.Label(key), inUse: true, lastStart: now})
         return list
+    }
+
+    static IID_IAudioSessionManager2 := "{77AA99A0-1BD6-484F-8BC7-2C654C9A9B6F}"
+    static IID_IAudioSessionControl2 := "{BFB7FF88-7239-4FC9-8FA2-07C950BE9C6D}"
+
+    /**
+     * Apps with an active capture session on any microphone, straight from
+     * the Windows audio engine. Keys use the registry's NonPackaged form,
+     * the exe path with each backslash written as #.
+     * Returns a Map of lowercase key -> key.
+     */
+    static LiveCaptureKeys() {
+        keys := Map()
+        en := AudioDevices.Enumerator()
+        pCol := 0
+        ComCall(3, en, "int", 1, "uint", 1, "ptr*", &pCol)  ; EnumAudioEndpoints(eCapture, ACTIVE)
+        col := ComValue(13, pCol)
+        count := 0
+        ComCall(3, col, "uint*", &count)  ; GetCount
+        Loop count {
+            try {
+                pDev := 0
+                ComCall(4, col, "uint", A_Index - 1, "ptr*", &pDev)  ; Item
+                dev := ComValue(13, pDev)
+                pMgr := 0
+                ComCall(3, dev, "ptr", Util.Guid(this.IID_IAudioSessionManager2), "uint", 23, "ptr", 0, "ptr*", &pMgr)  ; Activate
+                mgr := ComValue(13, pMgr)
+                pEnum := 0
+                ComCall(5, mgr, "ptr*", &pEnum)  ; GetSessionEnumerator
+                sessions := ComValue(13, pEnum)
+                n := 0
+                ComCall(3, sessions, "int*", &n)  ; GetCount
+                Loop n {
+                    try {
+                        pCtl := 0
+                        ComCall(4, sessions, "int", A_Index - 1, "ptr*", &pCtl)  ; GetSession
+                        ctl := ComValue(13, pCtl)
+                        state := 0
+                        ComCall(3, ctl, "int*", &state)  ; GetState
+                        if state != 1  ; AudioSessionStateActive
+                            continue
+                        ctl2 := ComObjQuery(ctl, this.IID_IAudioSessionControl2)
+                        pid := 0
+                        ComCall(14, ctl2, "uint*", &pid)  ; GetProcessId
+                        if pid = 0
+                            continue
+                        key := StrReplace(ProcessGetPath(pid), "\", "#")
+                        keys[StrLower(key)] := key
+                    }
+                }
+            }
+        }
+        return keys
     }
 
     ; The watched app that is on a call now, or "".

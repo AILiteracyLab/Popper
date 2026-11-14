@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Calls are spotted even when Windows stops updating its list of apps that used the microphone, which happens on some Windows 11 builds. Popper now also asks the Windows audio engine which apps are recording right now, and trusts either source
+
 ## [0.1.0] - 2026-11-12
 
 First public release.
