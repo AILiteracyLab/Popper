@@ -139,6 +139,16 @@ w.RawWrite(Buffer(16000, 0), 16000)
 w.Close()
 info := WavFile.Repair(capDir "\audio\crash.wav")
 Check("crash repair counts frames", info.frames = 8000, info.frames " frames")
+Check("silence measures quiet", WavFile.LoudestSecondDb(capDir "\audio\crash.wav") < Transcriber.QuietDb)
+tone := Buffer(64000)
+Loop 32000
+    NumPut("short", Round(3277 * Sin(A_Index * 0.39)), tone, (A_Index - 1) * 2)
+w := WavFile.Create(capDir "\audio\tone.wav")
+w.RawWrite(tone, 64000)
+w.Close()
+WavFile.Repair(capDir "\audio\tone.wav")
+toneDb := WavFile.LoudestSecondDb(capDir "\audio\tone.wav")
+Check("speech-level audio is not quiet", toneDb > Transcriber.QuietDb && toneDb < -20, Round(toneDb, 1) " dBFS")
 
 ; 6. Detector
 entries := Detector.Entries()

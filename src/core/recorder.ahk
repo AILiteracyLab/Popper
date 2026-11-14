@@ -54,6 +54,39 @@ class WavFile {
         return {frames: dataBytes // 2, peak: WavFile.Peak(path)}
     }
 
+    ; Loudness of the loudest second of a 16 kHz mono 16-bit WAV, in dBFS,
+    ; from every 4th sample. -100 for an empty file.
+    static LoudestSecondDb(path) {
+        f := FileOpen(path, "r", "CP0")
+        size := f.Length
+        if size <= 44 {
+            f.Close()
+            return -100
+        }
+        f.Pos := 44
+        buf := Buffer(size - 44)
+        f.RawRead(buf, size - 44)
+        f.Close()
+        count := (size - 44) // 2
+        best := 0
+        sum := 0, n := 0
+        i := 0
+        while i < count {
+            v := NumGet(buf, i * 2, "short")
+            sum += v * v
+            n++
+            if n = 4000 {  ; one second at 16 kHz, every 4th sample
+                if sum > best
+                    best := sum
+                sum := 0, n := 0
+            }
+            i += 4
+        }
+        if n > 0 && sum * 4000 / n > best
+            best := sum * 4000 / n
+        return best > 0 ? 10 * Log(best / 4000 / 1073741824) : -100
+    }
+
     ; Sampled peak (every 40th sample) of a 16-bit WAV.
     static Peak(path) {
         f := FileOpen(path, "r", "CP0")

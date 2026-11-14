@@ -18,6 +18,8 @@ class Transcriber {
     static Busy := false
     static Job := ""
     static RetryAt := 0
+    ; A piece whose loudest second is below this holds no speech worth sending.
+    static QuietDb := -40
     static OnSessionDone := ""
     static _nextFn := ""
     static _checkFn := ""
@@ -161,6 +163,19 @@ class Transcriber {
             s.Set("Waiting", "Waiting: the service refused the API key")
             this.RetryAt := A_TickCount + 3600000
             return
+        }
+        ; Speaches answers 500 for a piece over 30 s in which its voice
+        ; detector finds no speech (speaches-ai/speaches#608). A piece that
+        ; stays quiet throughout has nothing to transcribe, so count it as
+        ; silent instead of failing the transcript.
+        if code >= 500 {
+            db := -100
+            try db := WavFile.LoudestSecondDb(s.dir "\audio\" name ".wav")
+            if db < this.QuietDb {
+                s.SetChunk(name, "silent")
+                AppLog.Info("Chunk " s.Name " / " name ": quiet throughout (" Round(db) " dBFS), counted as silent")
+                return
+            }
         }
         tries := s.Attempts(name) + 1
         s.SetAttempts(name, tries)
