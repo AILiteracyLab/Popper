@@ -6,12 +6,12 @@ DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr")
 
 ;@Ahk2Exe-SetName Popper
 ;@Ahk2Exe-SetDescription Backup meeting transcription for Windows
-;@Ahk2Exe-SetVersion 0.1.0
+;@Ahk2Exe-SetVersion 0.1.1
 ;@Ahk2Exe-SetCopyright Copyright (c) 2026 Jamie Bykov-Brett
 ;@Ahk2Exe-SetCompanyName Bykov-Brett Enterprises
 
 global APP_NAME := "Popper"
-global APP_VERSION := "0.1.0"
+global APP_VERSION := "0.1.1"
 global APP_REPO := "https://github.com/AILiteracyLab/Popper"
 
 ; Core

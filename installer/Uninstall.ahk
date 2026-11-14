@@ -10,7 +10,7 @@
 
 ;@Ahk2Exe-SetName Popper Uninstall
 ;@Ahk2Exe-SetDescription Removes Popper
-;@Ahk2Exe-SetVersion 0.1.0
+;@Ahk2Exe-SetVersion 0.1.1
 ;@Ahk2Exe-SetCopyright Copyright (c) 2026 Jamie Bykov-Brett
 ;@Ahk2Exe-SetCompanyName Bykov-Brett Enterprises
 ;@Ahk2Exe-SetMainIcon ..\assets\icon.ico

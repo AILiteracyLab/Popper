@@ -11,7 +11,7 @@
 
 ;@Ahk2Exe-SetName Popper Setup
 ;@Ahk2Exe-SetDescription Popper Setup
-;@Ahk2Exe-SetVersion 0.1.0
+;@Ahk2Exe-SetVersion 0.1.1
 ;@Ahk2Exe-SetCopyright Copyright (c) 2026 Jamie Bykov-Brett
 ;@Ahk2Exe-SetCompanyName Bykov-Brett Enterprises
 ;@Ahk2Exe-SetMainIcon ..\assets\icon.ico
@@ -19,7 +19,7 @@
 DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr")
 
 global APP_NAME := "Popper"
-global APP_VERSION := "0.1.0"
+global APP_VERSION := "0.1.1"
 global PUBLISHER := "Jamie Bykov-Brett"
 global UNINSTALL_KEY := "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\Popper"
 global RUN_KEY := "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
